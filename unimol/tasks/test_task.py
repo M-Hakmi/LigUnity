@@ -105,12 +105,12 @@ def cal_metrics(y_true, y_score, alpha):
 
 def get_uniprot_seq(uniprot):
     import urllib
-    if not os.path.exists(f"./uniport_fasta/{uniprot}.fasta"):
-        os.system(f"mkdir -p ./uniport_fasta")
+    if not os.path.exists(f"./uniprot_fasta/{uniprot}.fasta"):
+        os.system(f"mkdir -p ./uniprot_fasta")
         urllib.request.urlretrieve(f"https://rest.uniprot.org/uniprotkb/{uniprot}.fasta",
-                                   f"./uniport_fasta/{uniprot}.fasta")
+                                   f"./uniprot_fasta/{uniprot}.fasta")
 
-    with open(f"./uniport_fasta/{uniprot}.fasta", "r") as f:
+    with open(f"./uniprot_fasta/{uniprot}.fasta", "r") as f:
         lines = []
         for line in f.readlines():
             if line.startswith(">"):
@@ -1054,10 +1054,12 @@ class ContrasRankTest(UnicoreTask):
         data_path = self.args.demo_lig_file
         mol_dataset = self.load_mols_dataset(data_path, "atoms", "coordinates")
 
-        bsz = 64
+        bsz = self.args.batch_size
         mol_reps = []
         mol_smis = []
-        mol_data = torch.utils.data.DataLoader(mol_dataset, batch_size=bsz, collate_fn=mol_dataset.collater)
+        mol_data = torch.utils.data.DataLoader(mol_dataset, batch_size=bsz, 
+                                                collate_fn=mol_dataset.collater,
+                                                num_workers=self.args.num_workers)
 
         for _, sample in enumerate(mol_data):
             sample = unicore.utils.move_to_cuda(sample)

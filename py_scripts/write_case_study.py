@@ -206,7 +206,7 @@ if __name__ == '__main__':
         # read the ligands smiles into a list
         smis = json.load(open(lig_file))
         data = []
-        print("number if ligands", len(set(smis)))
+        print("number of ligands", len(set(smis)))
         d_active = (mol_parser(list(set(smis))))
         data.extend(d_active)
 
